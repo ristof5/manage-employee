@@ -3,6 +3,8 @@
 const sql = require("mssql");
 
 const config = {
+  user: "sa",
+  password: "select123",
   server: "localhost",
   database: "wms",
   options: {
