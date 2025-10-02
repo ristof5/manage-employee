@@ -1,56 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="employeeApp">
   <head>
     <meta charset="UTF-8" />
     <title>Employee Management</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="app.js"></script>
     <script src="controllers/employeeController.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body ng-controller="EmployeeController">
-    <h1>Employee Management</h1>
-    <!-- Tambah Employee -->
-    <form ng-submit="addEmployee()">
-      <input
-        type="text"
-        ng-model="newEmployee.Name"
-        placeholder="Name"
-        required
-      />
-      <input
-        type="text"
-        ng-model="newEmployee.Position"
-        placeholder="Position"
-        required
-      />
-      <input
-        type="number"
-        ng-model="newEmployee.Salary"
-        placeholder="Salary"
-        required
-      />
-      <button type="submit">Add</button>
-    </form>
-    <hr />
-    <!-- List Employees -->
-    <table border="1" cellpadding="8">
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Salary</th>
-        <th>Action</th>
-      </tr>
-      <tr ng-repeat="emp in employees">
-        <td>{{emp.EmployeeId}}</td>
-        <td>{{emp.Name}}</td>
-        <td>{{emp.Position}}</td>
-        <td>{{emp.Salary}}</td>
-        <td>
-          <button ng-click="editEmployee(emp)">Edit</button>
-          <button ng-click="deleteEmployee(emp.EmployeeId)">Delete</button>
-        </td>
-      </tr>
-    </table>
+  <body ng-controller="EmployeeController" class="bg-gray-100 min-h-screen">
+    <div class="max-w-3xl mx-auto p-8 mt-10 bg-white rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold mb-6 text-center text-blue-700">
+        Employee Management
+      </h1>
+      <!-- Tambah Employee -->
+      <div class="flex gap-2 my-4">
+        <input
+          type="text"
+          ng-model="newEmployee.Name"
+          placeholder="Name"
+          class="border p-2 rounded w-1/4"
+        />
+        <input
+          type="text"
+          ng-model="newEmployee.Position"
+          placeholder="Position"
+          class="border p-2 rounded w-1/4"
+        />
+        <input
+          type="number"
+          ng-model="newEmployee.Salary"
+          placeholder="Salary"
+          class="border p-2 rounded w-1/4"
+        />
+        <button
+          ng-click="addEmployee()"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow transition"
+        >
+          Add
+        </button>
+      </div>
+      <hr />
+      <!-- List Employees -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-300 mt-4 rounded overflow-hidden">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="border px-4 py-2 w-20">ID</th>
+              <th class="border px-4 py-2 w-48">Name</th>
+              <th class="border px-4 py-2 w-48">Position</th>
+              <th class="border px-4 py-2 w-32">Salary</th>
+              <th class="border px-4 py-2 w-48">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="emp in employees"
+                ng-class="{'bg-blue-50 shadow-inner': editingEmployee && editingEmployee.EmployeeId === emp.EmployeeId}"
+                class="hover:bg-gray-50 transition">
+              <td class="border px-4 py-2 text-center align-middle">{{emp.EmployeeId}}</td>
+              <td class="border px-4 py-2 align-middle">
+                <span
+                  ng-if="!editingEmployee || editingEmployee.EmployeeId !== emp.EmployeeId"
+                  class="block"
+                  >{{emp.Name}}</span>
+                <input
+                  ng-if="editingEmployee && editingEmployee.EmployeeId === emp.EmployeeId"
+                  type="text"
+                  ng-model="editingEmployee.Name"
+                  class="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+                  autofocus
+                />
+              </td>
+              <td class="border px-4 py-2 align-middle">
+                <span
+                  ng-if="!editingEmployee || editingEmployee.EmployeeId !== emp.EmployeeId"
+                  class="block"
+                  >{{emp.Position}}</span>
+                <input
+                  ng-if="editingEmployee && editingEmployee.EmployeeId === emp.EmployeeId"
+                  type="text"
+                  ng-model="editingEmployee.Position"
+                  class="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+                />
+              </td>
+              <td class="border px-4 py-2 align-middle">
+                <span
+                  ng-if="!editingEmployee || editingEmployee.EmployeeId !== emp.EmployeeId"
+                  class="block"
+                  >{{emp.Salary}}</span>
+                <input
+                  ng-if="editingEmployee && editingEmployee.EmployeeId === emp.EmployeeId"
+                  type="number"
+                  ng-model="editingEmployee.Salary"
+                  class="border rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+                />
+              </td>
+              <td class="border px-4 py-2 align-middle">
+                <div
+                  ng-if="!editingEmployee || editingEmployee.EmployeeId !== emp.EmployeeId"
+                  class="flex gap-2 justify-center"
+                >
+                  <button
+                    ng-click="startEdit(emp)"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    ng-click="deleteEmployee(emp.EmployeeId)"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <div
+                  ng-if="editingEmployee && editingEmployee.EmployeeId === emp.EmployeeId"
+                  class="flex gap-2 justify-center"
+                >
+                  <button
+                    ng-click="updateEmployee()"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow transition"
+                  >
+                    Save
+                  </button>
+                  <button
+                    ng-click="cancelEdit()"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded shadow transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </body>
 </html>
