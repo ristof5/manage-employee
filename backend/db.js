@@ -1,8 +1,8 @@
+// db.js
+// Konfigurasi koneksi SQL Server menggunakan mssql
 const sql = require("mssql");
 
 const config = {
-  user: "sa",
-  password: "",
   server: "localhost",
   database: "wms",
   options: {
