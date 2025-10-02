@@ -1,79 +1,76 @@
+const API_BASE = "http://localhost:5000/api/employees";
+const DEPT_BASE = "http://localhost:5000/api/employees/departments";
+
 app.controller("EmployeeController", function($scope, $http) {
-  const apiUrl = "http://localhost:5000/api/employees";
+  $scope.page = 1;
+  $scope.limit = 10;
+  $scope.totalPages = 1;
+  $scope.search = "";
+  $scope.departments = [];
+  $scope.newEmployee = {};
+  $scope.editingEmployee = null;
 
-  $scope.employees = [];
-  $scope.newEmployee = { Name: "", Position: "", Salary: "" };
-  $scope.editingEmployee = null; // untuk menyimpan employee yang sedang di-edit
-
-  // Ambil semua employee
-  $scope.loadEmployees = function() {
-    $http.get(apiUrl).then(
-      function(response) {
-        $scope.employees = response.data;
-      },
-      function(error) {
-        console.error("Error fetching employees:", error);
+  $scope.getEmployees = function(page) {
+    $scope.page = page || 1;
+    $http.get(API_BASE, {
+      params: {
+        page: $scope.page,
+        limit: $scope.limit,
+        search: $scope.search
       }
-    );
+    }).then(function(res) {
+      $scope.employees = res.data.employees;
+      $scope.total = res.data.total;
+      $scope.totalPages = res.data.totalPages;
+    });
   };
 
-  // Tambah employee
+  $scope.getDepartments = function() {
+    $http.get(DEPT_BASE).then(function(res) {
+      $scope.departments = res.data;
+    });
+  };
+
   $scope.addEmployee = function() {
-    if (!$scope.newEmployee.Name || !$scope.newEmployee.Position || !$scope.newEmployee.Salary) {
-      alert("Semua field wajib diisi!");
+    if (
+      !$scope.newEmployee.Name ||
+      !$scope.newEmployee.Position ||
+      !$scope.newEmployee.Salary ||
+      !$scope.newEmployee.DepartmentID
+    ) {
+      alert("Lengkapi semua data!");
       return;
     }
-
-    $http.post(apiUrl, $scope.newEmployee).then(
-      function() {
-        $scope.newEmployee = { Name: "", Position: "", Salary: "" };
-        $scope.loadEmployees();
-      },
-      function(error) {
-        console.error("Error adding employee:", error);
-      }
-    );
+    $http.post(API_BASE, $scope.newEmployee).then(function() {
+      $scope.newEmployee = {};
+      $scope.getEmployees($scope.page);
+    });
   };
 
-  // Hapus employee
-  $scope.deleteEmployee = function(id) {
-    if (confirm("Yakin ingin menghapus data ini?")) {
-      $http.delete(apiUrl + "/" + id).then(
-        function() {
-          $scope.loadEmployees();
-        },
-        function(error) {
-          console.error("Error deleting employee:", error);
-        }
-      );
-    }
-  };
-
-  // Masuk ke mode edit
   $scope.startEdit = function(emp) {
-    $scope.editingEmployee = angular.copy(emp); // duplikat data biar aman
+    $scope.editingEmployee = angular.copy(emp);
   };
 
-  // Simpan hasil edit
   $scope.updateEmployee = function() {
-    if (!$scope.editingEmployee) return;
-
-    $http.put(apiUrl + "/" + $scope.editingEmployee.EmployeeId, $scope.editingEmployee).then(
-      function() {
-        $scope.editingEmployee = null;
-        $scope.loadEmployees();
-      },
-      function(error) {
-        console.error("Error updating employee:", error);
-      }
-    );
+    var id = $scope.editingEmployee.EmployeeId;
+    $http.put(API_BASE + "/" + id, $scope.editingEmployee).then(function() {
+      $scope.editingEmployee = null;
+      $scope.getEmployees($scope.page);
+    });
   };
 
-  // Batalkan edit
   $scope.cancelEdit = function() {
     $scope.editingEmployee = null;
   };
 
-  // Load data pertama kali
-  $scope.loadEmployees();
+  $scope.deleteEmployee = function(id) {
+    if (!confirm("Yakin hapus data ini?")) return;
+    $http.delete(API_BASE + "/" + id).then(function() {
+      $scope.getEmployees($scope.page);
+    });
+  };
+
+  // Initial Load
+  $scope.getDepartments();
+  $scope.getEmployees(1);
 });
