@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Employee Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+    <script src="controllers/employeeController.js"></script>
+  </head>
+  <body ng-controller="EmployeeController">
+    <h1>Employee Management</h1>
+    <!-- Tambah Employee -->
+    <form ng-submit="addEmployee()">
+      <input
+        type="text"
+        ng-model="newEmployee.Name"
+        placeholder="Name"
+        required
+      />
+      <input
+        type="text"
+        ng-model="newEmployee.Position"
+        placeholder="Position"
+        required
+      />
+      <input
+        type="number"
+        ng-model="newEmployee.Salary"
+        placeholder="Salary"
+        required
+      />
+      <button type="submit">Add</button>
+    </form>
+    <hr />
+    <!-- List Employees -->
+    <table border="1" cellpadding="8">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Position</th>
+        <th>Salary</th>
+        <th>Action</th>
+      </tr>
+      <tr ng-repeat="emp in employees">
+        <td>{{emp.EmployeeId}}</td>
+        <td>{{emp.Name}}</td>
+        <td>{{emp.Position}}</td>
+        <td>{{emp.Salary}}</td>
+        <td>
+          <button ng-click="editEmployee(emp)">Edit</button>
+          <button ng-click="deleteEmployee(emp.EmployeeId)">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
