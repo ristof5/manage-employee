@@ -3,8 +3,20 @@ const employeeModel = require("../models/employeeModel");
 const employeeController = {
   getAll: async (req, res) => {
     try {
-      const employees = await employeeModel.getAll();
-      res.json(employees);
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const search = req.query.search || "";
+      const { employees, total } = await employeeModel.getAll({
+        page,
+        limit,
+        search,
+      });
+      res.json({
+        employees,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -54,6 +66,14 @@ const employeeController = {
         return res.status(404).json({ message: "Employee not found" });
       }
       res.json({ message: "Employee deleted" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+  getDepartments: async (req, res) => {
+    try {
+      const departments = await employeeModel.getDepartments();
+      res.json(departments);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
